@@ -1,10 +1,10 @@
 package com.danielsanrocha.porygon
 
 import com.danielsanrocha.porygon.commons.Security
-import com.danielsanrocha.porygon.controllers.{HealthcheckController, LoginController, NotFoundController, OptionsController, UserController}
+import com.danielsanrocha.porygon.controllers.{AdvertiserController, HealthcheckController, LoginController, NotFoundController, OptionsController, UserController}
 import com.danielsanrocha.porygon.filters.{AuthenticationFilter, CORSFilter, ExceptionHandlerFilter}
-import com.danielsanrocha.porygon.repositories.UserRepository
-import com.danielsanrocha.porygon.services.UserService
+import com.danielsanrocha.porygon.repositories.{AdvertiserRepository, UserRepository}
+import com.danielsanrocha.porygon.services.{AdvertiserService, UserService}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.util.logging.Logger
@@ -33,9 +33,11 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
 
   logging.info("Creating Repositories...")
   implicit private val userRepository: UserRepository = new UserRepository()
+  implicit private val advertiserRepository: AdvertiserRepository = new AdvertiserRepository()
 
   logging.info("Creating services...")
   implicit private val userService: UserService = new UserService()
+  implicit private val advertiserService: AdvertiserService = new AdvertiserService()
 
   logging.info("Creating controllers...")
   private val healthcheckController = new HealthcheckController()
@@ -43,6 +45,7 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
   private val loginController = new LoginController()
   private val userController = new UserController()
   private val notFoundController = new NotFoundController()
+  private val advertiserController = new AdvertiserController()
 
   logging.info("Creating filters...")
   private val authenticationFilter = new AuthenticationFilter()
@@ -55,6 +58,7 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
     router.add(loginController)
     router.add(healthcheckController)
     router.add(authenticationFilter, userController)
+    router.add(authenticationFilter, advertiserController)
     router.add(notFoundController)
     router.add(optionsController)
   }

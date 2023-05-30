@@ -33,12 +33,18 @@ object Main extends App {
         logging.info("Starting server...")
         val server = new PorygonServer()
         server.main(args)
+
       case "createTables" =>
         logging.info("Creating tables...")
 
         logging.info("Creating tb_users table...")
         val userQuery = Source.fromResource("queries/CreateUsersTable.sql").mkString
         Await.result(client.run(sqlu"#$userQuery"), Duration.Inf)
+        logging.info("created!")
+
+        logging.info("Creating tb_advertisers table...")
+        val advertiserQuery = Source.fromResource("queries/CreateAdvertisersTable.sql").mkString
+        Await.result(client.run(sqlu"#$advertiserQuery"), Duration.Inf)
         logging.info("created!")
 
       case "hash" =>
