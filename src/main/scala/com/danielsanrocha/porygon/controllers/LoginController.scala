@@ -18,8 +18,8 @@ class LoginController(implicit val service: UserService, implicit val ec: Execut
   private val logging: Logger = Logger(this.getClass)
   private val jsonMapper = JsonMapper.builder().addModule(DefaultScalaModule).build()
 
-  post("/login") { credential: Credential =>
-    logging.debug("POST /login called")
+  post("/api/login") { credential: Credential =>
+    logging.debug("POST /api/login called")
     service.getByEmail(credential.email) map {
       case Some(user) =>
         Security.hash(credential.password) match {

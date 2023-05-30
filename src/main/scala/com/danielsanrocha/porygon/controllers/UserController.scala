@@ -6,11 +6,15 @@ import com.danielsanrocha.porygon.services.UserService
 import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.http.Request
 import com.twitter.finatra.http.Controller
+import com.twitter.util.logging.Logger
 
 import scala.concurrent.ExecutionContext
 
 class UserController(implicit val service: UserService, implicit val ec: ExecutionContext) extends Controller {
-  get("/user") { _: Request =>
+  private val logging: Logger = Logger(this.getClass)
+
+  get("/api/user") { _: Request =>
+    logging.debug("GET /api/user called!")
     val payload = Contexts.local.get(Payload).head
     service.getByEmail(payload.email) map {
       case Some(user) => response.ok(UserResponse(user))

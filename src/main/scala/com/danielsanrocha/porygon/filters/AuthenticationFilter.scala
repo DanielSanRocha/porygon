@@ -12,8 +12,8 @@ import com.twitter.util.Future
 import com.twitter.util.logging.Logger
 
 class AuthenticationFilter(implicit val security: Security) extends SimpleFilter[Request, Response] {
-  val logging: Logger = Logger(this.getClass)
-  val jsonMapper = JsonMapper.builder().addModule(DefaultScalaModule).build()
+  private val logging: Logger = Logger(this.getClass)
+  private val jsonMapper = JsonMapper.builder().addModule(DefaultScalaModule).build()
 
   override def apply(request: Request, service: Service[Request, Response]): Future[Response] = {
     request.headerMap.get("Authorization") match {
@@ -31,6 +31,7 @@ class AuthenticationFilter(implicit val security: Security) extends SimpleFilter
           Contexts.local.let(Payload, payload) { service(request) }
         } catch {
           case _: Throwable =>
+            logging.warn("Invalid Authorization header! Forbidden!")
             val forbiddenResponse = Response()
             forbiddenResponse.statusCode = 403
             forbiddenResponse.setContentTypeJson()

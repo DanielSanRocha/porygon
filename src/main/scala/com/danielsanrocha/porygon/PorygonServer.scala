@@ -1,7 +1,7 @@
 package com.danielsanrocha.porygon
 
 import com.danielsanrocha.porygon.commons.Security
-import com.danielsanrocha.porygon.controllers.{HealthcheckController, LoginController, OptionsController, UserController}
+import com.danielsanrocha.porygon.controllers.{HealthcheckController, LoginController, NotFoundController, OptionsController, UserController}
 import com.danielsanrocha.porygon.filters.AuthenticationFilter
 import com.danielsanrocha.porygon.repositories.UserRepository
 import com.danielsanrocha.porygon.services.UserService
@@ -42,6 +42,7 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
   private val optionsController = new OptionsController()
   private val loginController = new LoginController()
   private val userController = new UserController()
+  private val notFoundController = new NotFoundController()
 
   logging.info("Creating filters...")
   private val authenticationFilter = new AuthenticationFilter()
@@ -51,5 +52,6 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
     router.add(healthcheckController)
     router.add(optionsController)
     router.add(authenticationFilter, userController)
+    router.add(notFoundController)
   }
 }
