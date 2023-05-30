@@ -52,6 +52,11 @@ object Main extends App {
         Await.result(client.run(sqlu"#$creativeQuery"), Duration.Inf)
         logging.info("created!")
 
+        logging.info("Creating tb_slots table...")
+        val slotQuery = Source.fromResource("queries/CreateSlotsTable.sql").mkString
+        Await.result(client.run(sqlu"#$slotQuery"), Duration.Inf)
+        logging.info("created!")
+
       case "hash" =>
         args.length match {
           case 2 => println(s"Hash: ${Security.hash(args(1))}")

@@ -9,12 +9,13 @@ import com.danielsanrocha.porygon.controllers.{
   LoginController,
   NotFoundController,
   OptionsController,
+  SlotController,
   UploadController,
   UserController
 }
 import com.danielsanrocha.porygon.filters.{AuthenticationFilter, CORSFilter, ExceptionHandlerFilter}
-import com.danielsanrocha.porygon.repositories.{AdvertiserRepository, CreativeRepository, UploadRepository, UserRepository}
-import com.danielsanrocha.porygon.services.{AdvertiserService, CreativeService, UploadService, UserService}
+import com.danielsanrocha.porygon.repositories.{AdvertiserRepository, CreativeRepository, SlotRepository, UploadRepository, UserRepository}
+import com.danielsanrocha.porygon.services.{AdvertiserService, CreativeService, SlotService, UploadService, UserService}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.util.logging.Logger
@@ -48,12 +49,14 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
   implicit private val userRepository: UserRepository = new UserRepository()
   implicit private val advertiserRepository: AdvertiserRepository = new AdvertiserRepository()
   implicit private val creativeRepository: CreativeRepository = new CreativeRepository()
+  implicit private val slotRepository: SlotRepository = new SlotRepository()
 
   logging.info("Creating services...")
   implicit private val uploadService: UploadService = new UploadService()
   implicit private val userService: UserService = new UserService()
   implicit private val advertiserService: AdvertiserService = new AdvertiserService()
   implicit private val creativeService: CreativeService = new CreativeService()
+  implicit private val slotService: SlotService = new SlotService()
 
   logging.info("Creating controllers...")
   private val healthcheckController = new HealthcheckController()
@@ -65,6 +68,7 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
   private val advertiserController = new AdvertiserController()
   private val creativeController = new CreativeController()
   private val downloadController = new DownloadController()
+  private val slotController = new SlotController()
 
   logging.info("Creating filters...")
   private val authenticationFilter = new AuthenticationFilter()
@@ -80,6 +84,7 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
     router.add(authenticationFilter, userController)
     router.add(authenticationFilter, advertiserController)
     router.add(authenticationFilter, creativeController)
+    router.add(authenticationFilter, slotController)
     router.add(downloadController)
     router.add(notFoundController)
     router.add(optionsController)
