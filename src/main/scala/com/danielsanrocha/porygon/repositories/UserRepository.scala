@@ -36,4 +36,14 @@ class UserRepository(implicit val client: Database, implicit val ec: ExecutionCo
         None
     }
   }
+
+  def getById(id: Long): Future[Option[User]] = {
+    logging.debug(s"Searching for user with id $id...")
+    client.run(users.filter(_.id === id).result.headOption)
+  }
+
+  def getAll(offset: Long, limit: Long): Future[Seq[User]] = {
+    logging.debug(s"Getting users page with offset $offset and limit $limit...")
+    client.run(users.take(limit).drop(offset).result)
+  }
 }

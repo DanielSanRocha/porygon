@@ -14,4 +14,12 @@ class UserService(implicit val repository: UserRepository) {
   def getByEmail(email: String): Future[Option[User]] = {
     repository.getByEmail(email)
   }
+
+  def getAll(offset: Long, limit: Long): Future[Seq[User]] = {
+    repository.getAll(offset, limit)
+  }
+
+  def getById(id: Long): Future[Option[User]] = {
+    repository.getById(id)
+  }
 }

@@ -2,7 +2,7 @@ package com.danielsanrocha.porygon
 
 import com.danielsanrocha.porygon.commons.Security
 import com.danielsanrocha.porygon.controllers.{HealthcheckController, LoginController, NotFoundController, OptionsController, UserController}
-import com.danielsanrocha.porygon.filters.AuthenticationFilter
+import com.danielsanrocha.porygon.filters.{AuthenticationFilter, CORSFilter, ExceptionHandlerFilter}
 import com.danielsanrocha.porygon.repositories.UserRepository
 import com.danielsanrocha.porygon.services.UserService
 import com.twitter.finatra.http.HttpServer
@@ -46,12 +46,16 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
 
   logging.info("Creating filters...")
   private val authenticationFilter = new AuthenticationFilter()
+  private val corsFilter = new CORSFilter()
+  private val exceptionFilter = new ExceptionHandlerFilter()
 
   override protected def configureHttp(router: HttpRouter): Unit = {
+    router.filter(corsFilter)
+    router.filter(exceptionFilter)
     router.add(loginController)
     router.add(healthcheckController)
-    router.add(optionsController)
     router.add(authenticationFilter, userController)
     router.add(notFoundController)
+    router.add(optionsController)
   }
 }
