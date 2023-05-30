@@ -14,6 +14,7 @@ class CreativeRepository(implicit val client: Database, implicit val ec: Executi
 
   class CreativeTable(tag: Tag) extends Table[Creative](tag, "tb_creatives") {
     def id: Rep[Long] = column[Long]("id", O.PrimaryKey, O.AutoInc)
+    def advertiserId: Rep[Long] = column[Long]("id_advertiser")
     def name: Rep[String] = column[String]("name")
     def filename: Rep[String] = column[String]("filename")
     def description: Rep[String] = column[String]("description")
@@ -22,7 +23,7 @@ class CreativeRepository(implicit val client: Database, implicit val ec: Executi
     def createDate: Rep[Timestamp] = column[Timestamp]("create_date")
     def updateDate: Rep[Timestamp] = column[Timestamp]("update_date")
 
-    def * = (id, name, filename, description, width, height, createDate, updateDate) <> (Creative.tupled, Creative.unapply)
+    def * = (id, advertiserId, name, filename, description, width, height, createDate, updateDate) <> (Creative.tupled, Creative.unapply)
   }
 
   private lazy val creatives = TableQuery[CreativeTable]
@@ -39,8 +40,8 @@ class CreativeRepository(implicit val client: Database, implicit val ec: Executi
 
   def create(creative: NewCreative): Future[Long] = {
     client.run(
-      (creatives.map(c => (c.name, c.filename, c.description, c.width, c.height)) returning creatives.map(_.id)) +=
-        ((creative.name, creative.filename, creative.description, creative.width, creative.height))
+      (creatives.map(c => (c.advertiserId, c.name, c.filename, c.description, c.width, c.height)) returning creatives.map(_.id)) +=
+        ((creative.idAdvertiser, creative.name, creative.filename, creative.description, creative.width, creative.height))
     )
   }
 
@@ -48,8 +49,8 @@ class CreativeRepository(implicit val client: Database, implicit val ec: Executi
     client.run(
       creatives
         .filter(_.id === id)
-        .map(c => (c.name, c.filename, c.description, c.width, c.height))
-        .update(creative.name, creative.filename, creative.description, creative.width, creative.height)
+        .map(c => (c.advertiserId, c.name, c.filename, c.description, c.width, c.height))
+        .update(creative.idAdvertiser, creative.name, creative.filename, creative.description, creative.width, creative.height)
     ) map { _ => }
   }
 

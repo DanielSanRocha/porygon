@@ -1,6 +1,7 @@
 package com.danielsanrocha.porygon.models.internals
 
 case class UpdateCreative(
+    idAdvertiser: Long,
     name: String,
     filename: String,
     description: String,

@@ -29,7 +29,7 @@ class CreativeController(implicit val service: CreativeService, implicit val ec:
 
   post("/api/creative") { request: CreativeRequest =>
     logging.debug("POST /api/creative called!")
-    service.create(NewCreative(request.name, request.filename, request.description, request.width, request.height)) map { id =>
+    service.create(NewCreative(request.idAdvertiser, request.name, request.filename, request.description, request.width, request.height)) map { id =>
       logging.debug("New creative created with success!")
       response.ok(Created(id))
     }
@@ -37,7 +37,7 @@ class CreativeController(implicit val service: CreativeService, implicit val ec:
 
   put("/api/creative/:id") { request: UpdateCreativeRequest =>
     logging.debug(s"PUT /api/creative/${request.id} called!")
-    service.update(request.id, UpdateCreative(request.name, request.filename, request.description, request.width, request.height)) map { _ =>
+    service.update(request.id, UpdateCreative(request.idAdvertiser, request.name, request.filename, request.description, request.width, request.height)) map { _ =>
       logging.debug("Creative updated with success!")
       response.ok(Message("updated"))
     }

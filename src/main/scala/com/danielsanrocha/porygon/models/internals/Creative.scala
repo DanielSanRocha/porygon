@@ -4,6 +4,7 @@ import java.sql.Timestamp
 
 case class Creative(
     id: Long,
+    idAdvertiser: Long,
     name: String,
     filename: String,
     description: String,
