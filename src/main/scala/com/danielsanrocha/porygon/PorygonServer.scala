@@ -1,10 +1,20 @@
 package com.danielsanrocha.porygon
 
 import com.danielsanrocha.porygon.commons.Security
-import com.danielsanrocha.porygon.controllers.{AdvertiserController, HealthcheckController, LoginController, NotFoundController, OptionsController, UserController}
+import com.danielsanrocha.porygon.controllers.{
+  AdvertiserController,
+  CreativeController,
+  DownloadController,
+  HealthcheckController,
+  LoginController,
+  NotFoundController,
+  OptionsController,
+  UploadController,
+  UserController
+}
 import com.danielsanrocha.porygon.filters.{AuthenticationFilter, CORSFilter, ExceptionHandlerFilter}
-import com.danielsanrocha.porygon.repositories.{AdvertiserRepository, UserRepository}
-import com.danielsanrocha.porygon.services.{AdvertiserService, UserService}
+import com.danielsanrocha.porygon.repositories.{AdvertiserRepository, CreativeRepository, UploadRepository, UserRepository}
+import com.danielsanrocha.porygon.services.{AdvertiserService, CreativeService, UploadService, UserService}
 import com.twitter.finatra.http.HttpServer
 import com.twitter.finatra.http.routing.HttpRouter
 import com.twitter.util.logging.Logger
@@ -31,13 +41,19 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
   private val secret = conf.getString("api.secret")
   implicit private val security: Security = new Security(secret)
 
+  private val uploadFolder = conf.getString("api.upload.folder")
+
   logging.info("Creating Repositories...")
+  implicit private val uploadRepository: UploadRepository = new UploadRepository(uploadFolder)
   implicit private val userRepository: UserRepository = new UserRepository()
   implicit private val advertiserRepository: AdvertiserRepository = new AdvertiserRepository()
+  implicit private val creativeRepository: CreativeRepository = new CreativeRepository()
 
   logging.info("Creating services...")
+  implicit private val uploadService: UploadService = new UploadService()
   implicit private val userService: UserService = new UserService()
   implicit private val advertiserService: AdvertiserService = new AdvertiserService()
+  implicit private val creativeService: CreativeService = new CreativeService()
 
   logging.info("Creating controllers...")
   private val healthcheckController = new HealthcheckController()
@@ -45,7 +61,10 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
   private val loginController = new LoginController()
   private val userController = new UserController()
   private val notFoundController = new NotFoundController()
+  private val uploadController = new UploadController()
   private val advertiserController = new AdvertiserController()
+  private val creativeController = new CreativeController()
+  private val downloadController = new DownloadController()
 
   logging.info("Creating filters...")
   private val authenticationFilter = new AuthenticationFilter()
@@ -57,8 +76,11 @@ class PorygonServer(implicit val client: Database, implicit val ec: ExecutionCon
     router.filter(exceptionFilter)
     router.add(loginController)
     router.add(healthcheckController)
+    router.add(authenticationFilter, uploadController)
     router.add(authenticationFilter, userController)
     router.add(authenticationFilter, advertiserController)
+    router.add(authenticationFilter, creativeController)
+    router.add(downloadController)
     router.add(notFoundController)
     router.add(optionsController)
   }

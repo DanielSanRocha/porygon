@@ -47,6 +47,11 @@ object Main extends App {
         Await.result(client.run(sqlu"#$advertiserQuery"), Duration.Inf)
         logging.info("created!")
 
+        logging.info("Creating tb_creatives table...")
+        val creativeQuery = Source.fromResource("queries/CreateCreativesTable.sql").mkString
+        Await.result(client.run(sqlu"#$creativeQuery"), Duration.Inf)
+        logging.info("created!")
+
       case "hash" =>
         args.length match {
           case 2 => println(s"Hash: ${Security.hash(args(1))}")
